@@ -26,11 +26,27 @@ export class RarePatternsHelper {
         ...(this.json[itemName][tierName] || []),
         ...(paintseeds || []),
       ]);
-      this.json[itemName][tierName] = Array.from(paintseedsSet);
+      // make sure paintseeds are number
+      this.json[itemName][tierName] = Array.from(paintseedsSet).map((x) =>
+        Number(x)
+      );
     }
+  }
+  tidy() {
+    Object.keys(this.json).forEach((itemName) => {
+      const tiers = this.json[itemName];
+      Object.keys(tiers).forEach((tierName) => {
+        const paintseeds = tiers[tierName].map((x) => Number(x));
+        tiers[tierName] = paintseeds.sort((a, b) => a - b);
+      });
+    });
   }
   save() {
     const json_str = JSON.stringify(this.json, null, 2);
     fs.writeFileSync(this.save_path, json_str);
   }
 }
+
+// const r = new RarePatternsHelper();
+// r.tidy();
+// r.save();
